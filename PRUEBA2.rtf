@@ -1,0 +1,618 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 import React, \{ useMemo, useState \} from "react";\
+import \{\
+  ResponsiveContainer,\
+  LineChart,\
+  Line,\
+  XAxis,\
+  YAxis,\
+  CartesianGrid,\
+  Tooltip,\
+  Legend,\
+  ReferenceArea,\
+  ReferenceLine,\
+\} from "recharts";\
+\
+// Datos actualizados con la informaci\'f3n correcta\
+const KEY_POINTS = [\
+  ["2017-08", 436], ["2018-02", 700], ["2019-03", 1250], ["2019-10", 2550],\
+  ["2020-01", 2800], ["2020-08", 4130], ["2021-07", 16036], ["2021-08", 17200],\
+  ["2021-10", 18304], ["2021-12", 21104], ["2022-04", 20024], ["2022-07", 19642],\
+  ["2022-10", 19352], ["2023-01", 19062], ["2023-04", 19128], ["2023-07", 18676],\
+  ["2023-10", 18224], ["2024-01", 17918], ["2024-04", 17638], ["2024-07", 17600],\
+  ["2024-08", 17550], ["2024-09", 15920], ["2024-10", 15850], ["2024-12", 15630],\
+  ["2025-01", 15869], ["2025-02", 16020], ["2025-03", 17000], ["2025-04", 17081],\
+  ["2025-05", 17006], ["2025-06", 17515], ["2025-07", 18000], ["2025-08", 19000],\
+  ["2025-09", 20000], ["2025-10", 21000], ["2025-11", 22000], ["2025-12", 23000],\
+  ["2026-01", 24000],\
+];\
+\
+// Fases del desarrollo actualizadas\
+const PHASES = [\
+  \{\
+    id: "estudiante",\
+    name: "FASE ESTUDIANTE",\
+    start: "2017-08",\
+    end: "2019-05",\
+    color: "#FF9F43",\
+    description: "Periodo de aprendizaje y experimentaci\'f3n inicial en redes sociales. Crecimiento lento pero constante, pasando de 436 a 1,250 seguidores. Durante esta fase se exploraron diferentes tipos de contenido y se aprendieron las bases del marketing digital."\
+  \},\
+  \{\
+    id: "arranque-profesional",\
+    name: "FASE ARRANQUE PROFESIONAL",\
+    start: "2019-06",\
+    end: "2020-02",\
+    color: "#00D2D3",\
+    description: "Inicio de la actividad profesional con un enfoque m\'e1s estrat\'e9gico. Crecimiento acelerado de 1,250 a 2,800 seguidores. Se empez\'f3 a generar contenido m\'e1s espec\'edfico y orientado al p\'fablico objetivo."\
+  \},\
+  \{\
+    id: "covid",\
+    name: "FASE DURANTE EL COVID-19",\
+    start: "2020-03",\
+    end: "2020-07",\
+    color: "#A3CB38",\
+    description: "Adaptaci\'f3n al nuevo entorno digital durante la pandemia. Aprovechamiento del aumento de usuarios en redes sociales, creciendo de 2,800 a 4,130 seguidores. Cambio de estrategia para contenido relevante en tiempos de crisis."\
+  \},\
+  \{\
+    id: "crecimiento-consolidacion",\
+    name: "FASE DE CRECIMIENTO Y CONSOLIDACI\'d3N",\
+    start: "2020-07",\
+    end: "2021-01",\
+    color: "#6C5CE7",\
+    description: "Establecimiento como referente en el sector. Crecimiento sostenido de 4,130 a 7,630 seguidores. Consolidaci\'f3n de la audiencia y mejora en la calidad del contenido. Mayor engagement con la comunidad."\
+  \},\
+  \{\
+    id: "mas-publicaciones",\
+    name: "FASE M\'c1S PUBLICACIONES, CALIDAD, ACTIVIDAD Y CRECIMIENTO",\
+    start: "2021-02",\
+    end: "2022-04",\
+    color: "#1E90FF",\
+    description: "Periodo de m\'e1ximo esplendor con crecimiento explosivo hasta alcanzar el pico hist\'f3rico de 21,104 seguidores. Alta frecuencia de publicaciones, contenido de m\'e1xima calidad y elevada interacci\'f3n con la audiencia. Mayor alcance org\'e1nico conseguido."\
+  \},\
+  \{\
+    id: "precampana-kit-algoritmo",\
+    name: "FASE DE PRECAMPA\'d1A, KIT DIGITAL Y CAMBIO DE ALGORITMO",\
+    start: "2022-05",\
+    end: "2023-06",\
+    color: "#FF4757",\
+    description: "Inicio del declive debido a factores externos: cambios en el algoritmo de las redes sociales, saturaci\'f3n de contenido del Kit Digital y politizaci\'f3n del entorno digital. P\'e9rdida gradual de seguidores desde 20,024 hasta 18,676. Disminuci\'f3n del alcance org\'e1nico."\
+  \},\
+  \{\
+    id: "sin-actividad",\
+    name: "FASE SIN ACTIVIDAD Y BAJA MOTIVACI\'d3N",\
+    start: "2023-07",\
+    end: "2024-08",\
+    color: "#718093",\
+    description: "Periodo de abandono casi total de la cuenta. M\'ednima actividad, nula creaci\'f3n de contenido y p\'e9rdida constante de seguidores hasta 17,550. Otras prioridades profesionales y falta de motivaci\'f3n afectaron el rendimiento de la cuenta."\
+  \},\
+  \{\
+    id: "limpieza",\
+    name: "FASE DE LIMPIEZA Y REESTRUCTURACI\'d3N",\
+    start: "2024-09",\
+    end: "2024-11",\
+    color: "#FFA502",\
+    description: "Proceso de depuraci\'f3n activa de la cuenta con eliminaci\'f3n de 1,630 seguidores inactivos o fake, reduciendo temporalmente a 15,920. Preparaci\'f3n de la cuenta para un nuevo comienzo con una audiencia m\'e1s genuina y comprometida."\
+  \},\
+  \{\
+    id: "contenido-planificado",\
+    name: "FASE DE NUEVO ENFOQUE Y CRECIMIENTO",\
+    start: "2024-11",\
+    end: "2025-06",\
+    color: "#2ECC71",\
+    description: "Renacimiento estrat\'e9gico con un plan de contenido definido y objetivos claros. Recuperaci\'f3n gradual de seguidores de calidad, pasando de 15,630 a 17,515. Implementaci\'f3n de nuevas estrategias de contenido y mayor \'e9nfasis en la calidad sobre la cantidad. Ligeras fluctuaciones normales del crecimiento org\'e1nico."\
+  \},\
+];\
+\
+// Niveles de compromiso\
+const COMMITMENT_LEVELS = \{\
+  "2017-08": 40,\
+  "2019-06": 70,\
+  "2020-03": 80,\
+  "2020-07": 90,\
+  "2021-02": 100,\
+  "2022-05": 60,\
+  "2023-07": 20,\
+  "2024-09": 50,\
+  "2024-11": 80,\
+  "2025-06": 85,\
+\};\
+\
+// Hitos importantes\
+const KEY_MILESTONES = [\
+  \{\
+    id: "peak",\
+    date: "2021-12",\
+    value: 21104,\
+    label: "Pico M\'e1ximo",\
+    color: "#4CAF50",\
+    description: "Punto m\'e1s alto de seguidores alcanzado",\
+  \},\
+  \{\
+    id: "post-peak-min",\
+    date: "2024-12",\
+    value: 15630,\
+    label: "M\'ednimo Post-Pico",\
+    color: "#F44336",\
+    description: "Punto m\'e1s bajo despu\'e9s del pico m\'e1ximo",\
+  \}\
+];\
+\
+// Utilidad para calcular diferencia en meses\
+const monthDiff = (a, b) => \{\
+  const [ay, am] = a.split("-").map(Number);\
+  const [by, bm] = b.split("-").map(Number);\
+  return (by - ay) * 12 + (bm - am);\
+\};\
+\
+// Funci\'f3n para construir datos mensuales\
+const buildMonthlyData = (points) => \{\
+  const data = [];\
+  let index = 0;\
+  \
+  const historicalEndDate = "2025-06";\
+  \
+  for (let i = 0; i < points.length - 1; i++) \{\
+    const [d0, v0] = points[i];\
+    const [d1, v1] = points[i + 1];\
+    const gap = monthDiff(d0, d1);\
+    const [y, m] = d0.split("-").map(Number);\
+    \
+    for (let k = 0; k < gap; k++) \{\
+      const pct = k / gap;\
+      const val = Math.round(v0 + pct * (v1 - v0));\
+      const totalMonths = y * 12 + (m - 1) + k;\
+      const year = Math.floor(totalMonths / 12);\
+      const month = (totalMonths % 12) + 1;\
+      const dateStr = `$\{year\}-$\{month.toString().padStart(2, '0')\}`;\
+      \
+      data.push(\{\
+        index,\
+        value: val,\
+        date: new Date(year, month - 1, 1),\
+        dateStr,\
+        projected: dateStr > historicalEndDate\
+      \});\
+      index++;\
+    \}\
+  \}\
+  \
+  const [lastD, lastV] = points[points.length - 1];\
+  const [ly, lm] = lastD.split("-").map(Number);\
+  data.push(\{ \
+    index, \
+    value: lastV, \
+    date: new Date(ly, lm - 1, 1), \
+    dateStr: lastD,\
+    projected: lastD > historicalEndDate \
+  \});\
+  \
+  return data;\
+\};\
+\
+// Funci\'f3n para obtener nivel de compromiso\
+const getCommitmentLevel = (dateStr) => \{\
+  const dates = Object.keys(COMMITMENT_LEVELS).sort();\
+  let prevDate = dates[0];\
+  let nextDate = null;\
+  \
+  for (let i = 0; i < dates.length; i++) \{\
+    if (dateStr >= dates[i]) \{\
+      prevDate = dates[i];\
+      nextDate = dates[i + 1] || dates[i];\
+    \} else \{\
+      break;\
+    \}\
+  \}\
+  \
+  if (dateStr === prevDate) \{\
+    return COMMITMENT_LEVELS[prevDate];\
+  \}\
+  \
+  const prevLevel = COMMITMENT_LEVELS[prevDate];\
+  const nextLevel = COMMITMENT_LEVELS[nextDate];\
+  \
+  if (prevDate === nextDate) return prevLevel;\
+  \
+  const monthDiffTotal = monthDiff(prevDate, nextDate);\
+  const monthDiffCurrent = monthDiff(prevDate, dateStr);\
+  \
+  if (monthDiffTotal === 0) return prevLevel;\
+  \
+  const ratio = monthDiffCurrent / monthDiffTotal;\
+  return Math.round(prevLevel + ratio * (nextLevel - prevLevel));\
+\};\
+\
+const formatLabel = (dt) =>\
+  dt.toLocaleString("default", \{ month: "short", year: "numeric" \});\
+\
+// Componente Switch\
+const Switch = (\{ checked, onChange, label \}) => (\
+  <label className="inline-flex items-center space-x-2 cursor-pointer">\
+    <span className="text-sm text-black">\{label\}</span>\
+    <div className=\{`relative h-5 w-9 cursor-pointer rounded-full transition-colors $\{\
+      checked ? 'bg-blue-600' : 'bg-gray-300'\
+    \}`\} onClick=\{() => onChange(!checked)\}>\
+      <div className=\{`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform $\{\
+        checked ? 'translate-x-4' : ''\
+      \}`\}></div>\
+    </div>\
+  </label>\
+);\
+\
+// Componente de indicador de compromiso\
+const CommitmentIndicator = (\{ phases, data \}) => \{\
+  return (\
+    <div className="w-full mb-6">\
+      <div className="flex items-center justify-between text-xs text-gray-500 mb-1">\
+        <span>Nivel de Compromiso</span>\
+        <span>0% \'97 50% \'97 100%</span>\
+      </div>\
+      <div className="relative w-full h-2 bg-gray-100 rounded">\
+        \{phases.map((phase) => \{\
+          const startIndex = data.findIndex(d => d.dateStr >= phase.start);\
+          const endIndex = data.findIndex(d => d.dateStr > phase.end);\
+          const width = endIndex === -1 \
+            ? ((data.length - startIndex) / data.length) * 100 \
+            : ((endIndex - startIndex) / data.length) * 100;\
+          const left = (startIndex / data.length) * 100;\
+          \
+          const commitment = Math.round((getCommitmentLevel(phase.start) + getCommitmentLevel(phase.end)) / 2);\
+          \
+          return (\
+            <div\
+              key=\{phase.id\}\
+              className="absolute h-full"\
+              style=\{\{\
+                left: `$\{left\}%`,\
+                width: `$\{width\}%`,\
+              \}\}\
+            >\
+              <div \
+                className="h-full rounded"\
+                style=\{\{\
+                  backgroundColor: phase.color,\
+                  opacity: commitment / 100,\
+                \}\}\
+              >\
+              </div>\
+              <span \
+                className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full text-xs font-medium mt-1"\
+                style=\{\{ color: phase.color \}\}\
+              >\
+                \{commitment\}%\
+              </span>\
+            </div>\
+          );\
+        \})\}\
+      </div>\
+    </div>\
+  );\
+\};\
+\
+// Componente de timeline de fases\
+const PhaseTimeline = (\{ phases, data \}) => \{\
+  const [tooltipInfo, setTooltipInfo] = useState(null);\
+\
+  const handleMouseEnter = (phase, event) => \{\
+    const rect = event.currentTarget.getBoundingClientRect();\
+    const viewportHeight = window.innerHeight;\
+    const viewportWidth = window.innerWidth;\
+    \
+    const showAbove = rect.top > viewportHeight / 2;\
+    \
+    let x = rect.left + rect.width / 2;\
+    const tooltipWidth = 360;\
+    \
+    if (x - tooltipWidth / 2 < 20) \{\
+      x = tooltipWidth / 2 + 20;\
+    \} else if (x + tooltipWidth / 2 > viewportWidth - 20) \{\
+      x = viewportWidth - tooltipWidth / 2 - 20;\
+    \}\
+    \
+    setTooltipInfo(\{\
+      phase,\
+      x,\
+      y: showAbove ? rect.top - 10 : rect.bottom + 10,\
+      showAbove\
+    \});\
+  \};\
+\
+  const handleMouseLeave = () => \{\
+    setTooltipInfo(null);\
+  \};\
+\
+  return (\
+    <div className="w-full mb-8">\
+      <h3 className="text-lg font-semibold mb-4">Fases del Desarrollo</h3>\
+      <div className="relative w-full h-8 bg-gray-100 rounded-lg overflow-hidden">\
+        \{phases.map((phase) => \{\
+          const startIndex = data.findIndex(d => d.dateStr >= phase.start);\
+          const endIndex = data.findIndex(d => d.dateStr > phase.end);\
+          const width = endIndex === -1 \
+            ? ((data.length - startIndex) / data.length) * 100 \
+            : ((endIndex - startIndex) / data.length) * 100;\
+          const left = (startIndex / data.length) * 100;\
+          \
+          return (\
+            <div\
+              key=\{phase.id\}\
+              className="absolute h-full transition-opacity duration-200 cursor-pointer hover:opacity-90"\
+              style=\{\{\
+                backgroundColor: phase.color,\
+                left: `$\{left\}%`,\
+                width: `$\{width\}%`,\
+                opacity: 0.7,\
+              \}\}\
+              onMouseEnter=\{(e) => handleMouseEnter(phase, e)\}\
+              onMouseLeave=\{handleMouseLeave\}\
+            />\
+          );\
+        \})\}\
+      </div>\
+      \
+      \{tooltipInfo && (\
+        <div\
+          className="fixed px-4 py-3 bg-black bg-opacity-90 text-white text-sm rounded-lg shadow-lg z-50"\
+          style=\{\{\
+            left: tooltipInfo.x,\
+            top: tooltipInfo.y,\
+            transform: tooltipInfo.showAbove ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',\
+            maxWidth: '360px',\
+            minWidth: '280px',\
+            textAlign: 'left',\
+          \}\}\
+        >\
+          <div className="font-bold text-base mb-1">\{tooltipInfo.phase.name\}</div>\
+          <div className="text-xs font-medium mb-2 text-gray-300">\
+            \{new Date(tooltipInfo.phase.start + "-01").toLocaleDateString('es-ES', \{ month: 'long', year: 'numeric' \})\} - \
+            \{new Date(tooltipInfo.phase.end + "-01").toLocaleDateString('es-ES', \{ month: 'long', year: 'numeric' \})\}\
+          </div>\
+          <div className="text-sm text-gray-200 leading-relaxed">\
+            \{tooltipInfo.phase.description\}\
+          </div>\
+        </div>\
+      )\}\
+      \
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">\
+        \{phases.map((phase) => (\
+          <div key=\{phase.id\} className="flex items-center space-x-2">\
+            <div\
+              className="w-4 h-4 rounded"\
+              style=\{\{ backgroundColor: phase.color \}\}\
+            />\
+            <span className="text-xs">\{phase.name\}</span>\
+          </div>\
+        ))\}\
+      </div>\
+    </div>\
+  );\
+\};\
+\
+export default function SocialGrowthDashboard() \{\
+  const data = useMemo(() => buildMonthlyData(KEY_POINTS), []);\
+  const [showProj, setShowProj] = useState(true);\
+  const [showPhases, setShowPhases] = useState(true);\
+  const [timePeriod, setTimePeriod] = useState("all");\
+\
+  const projStart = data.find((d) => d.projected)?.index;\
+\
+  // Filtrar datos seg\'fan el per\'edodo seleccionado\
+  const filteredData = useMemo(() => \{\
+    if (timePeriod === "all") return data;\
+    \
+    const year = parseInt(timePeriod);\
+    return data.filter(d => d.date.getFullYear() === year);\
+  \}, [data, timePeriod]);\
+\
+  // Filtrar fases seg\'fan el per\'edodo seleccionado\
+  const filteredPhases = useMemo(() => \{\
+    if (timePeriod === "all") return PHASES;\
+    \
+    const year = parseInt(timePeriod);\
+    const yearStart = `$\{year\}-01`;\
+    const yearEnd = `$\{year\}-12`;\
+    \
+    return PHASES.filter(phase => \
+      (phase.start <= yearEnd && phase.end >= yearStart)\
+    );\
+  \}, [timePeriod]);\
+\
+  const periods = [\
+    \{ key: "all", label: "Todo" \},\
+    \{ key: "2017", label: "2017" \},\
+    \{ key: "2018", label: "2018" \},\
+    \{ key: "2019", label: "2019" \},\
+    \{ key: "2020", label: "2020" \},\
+    \{ key: "2021", label: "2021" \},\
+    \{ key: "2022", label: "2022" \},\
+    \{ key: "2023", label: "2023" \},\
+    \{ key: "2024", label: "2024" \},\
+    \{ key: "2025", label: "2025" \},\
+    \{ key: "2026", label: "2026" \},\
+  ];\
+\
+  return (\
+    <div className="bg-white text-black rounded-2xl shadow-lg p-6">\
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">\
+        <h2 className="text-2xl font-sans font-semibold">Seguidores</h2>\
+        <div className="flex flex-wrap items-center gap-4 mt-4 sm:mt-0">\
+          <Switch\
+            checked=\{showProj\}\
+            onChange=\{setShowProj\}\
+            label=\{showProj ? "Objetivo ON" : "Objetivo OFF"\}\
+          />\
+          <Switch\
+            checked=\{showPhases\}\
+            onChange=\{setShowPhases\}\
+            label=\{showPhases ? "Fases ON" : "Fases OFF"\}\
+          />\
+        </div>\
+      </header>\
+\
+      \{/* Controles de per\'edodo */\}\
+      <div className="mb-6">\
+        <div className="flex flex-wrap items-center gap-2">\
+          <span className="text-sm font-medium text-gray-600 mr-2">A\'f1o:</span>\
+          \{periods.map((period) => (\
+            <button\
+              key=\{period.key\}\
+              onClick=\{() => setTimePeriod(period.key)\}\
+              className=\{`px-2.5 py-1 text-sm rounded-md transition-all $\{\
+                timePeriod === period.key\
+                  ? 'bg-blue-600 text-white font-medium shadow-sm'\
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'\
+              \}`\}\
+            >\
+              \{period.label\}\
+            </button>\
+          ))\}\
+        </div>\
+      </div>\
+\
+      \{showPhases && <PhaseTimeline phases=\{filteredPhases\} data=\{filteredData\} />\}\
+      \{showPhases && <CommitmentIndicator phases=\{filteredPhases\} data=\{filteredData\} />\}\
+\
+      <div className="mb-4">\
+        <h3 className="text-lg font-semibold mb-2">Evoluci\'f3n de Seguidores</h3>\
+        <div className="w-full" style=\{\{ height: '600px' \}\}>\
+          <ResponsiveContainer width="100%" height="100%">\
+            <LineChart data=\{filteredData\} margin=\{\{ top: 20, right: 30, left: 20, bottom: 20 \}\}>\
+              <CartesianGrid stroke="#E5E5EA" strokeDasharray="3 3" />\
+\
+              <XAxis\
+                dataKey="index"\
+                type="number"\
+                domain=\{[filteredData[0]?.index || 0, filteredData[filteredData.length - 1]?.index || 0]\}\
+                ticks=\{\
+                  timePeriod === "all" \
+                    ? filteredData.filter((d) => d.date.getMonth() === 0).map((d) => d.index)\
+                    : filteredData.filter((d, i) => i % Math.max(1, Math.floor(filteredData.length / 8)) === 0).map((d) => d.index)\
+                \}\
+                tickFormatter=\{(i) => \{\
+                  const point = filteredData.find((d) => d.index === i);\
+                  if (!point) return '';\
+                  return timePeriod === "all" \
+                    ? formatLabel(point.date)\
+                    : point.date.toLocaleDateString('es-ES', \{ month: 'short' \});\
+                \}\}\
+                tick=\{\{ fontSize: 12, fill: "#1C1C1E" \}\}\
+                axisLine=\{\{ stroke: "#1C1C1E" \}\}\
+                tickLine=\{false\}\
+              />\
+\
+              <YAxis\
+                domain=\{[0, 25000]\}\
+                type="number"\
+                tickFormatter=\{(v) => `$\{Math.round(v / 1000)\}k`\}\
+                ticks=\{Array.from(\{length: 26\}, (_, i) => i * 1000)\}\
+                width=\{60\}\
+                tick=\{\{ fontSize: 12, fill: "#1C1C1E" \}\}\
+                axisLine=\{\{ stroke: "#1C1C1E" \}\}\
+                tickLine=\{false\}\
+              />\
+\
+              <Tooltip\
+                contentStyle=\{\{\
+                  backgroundColor: "#FFFFFF",\
+                  borderRadius: 8,\
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",\
+                  border: "none",\
+                \}\}\
+                labelFormatter=\{(i) => \{\
+                  const point = filteredData.find((d) => d.index === i);\
+                  return point ? formatLabel(point.date) : '';\
+                \}\}\
+                itemStyle=\{\{ color: "#1C1C1E" \}\}\
+                labelStyle=\{\{ fontWeight: 600, color: "#1C1C1E" \}\}\
+              />\
+\
+              <ReferenceLine\
+                y=\{21104\}\
+                stroke="#8E8E93"\
+                strokeDasharray="3 3"\
+                label=\{\{\
+                  value: `Pico 21,104`,\
+                  position: "topRight",\
+                  fontSize: 12,\
+                  fill: "#1C1C1E",\
+                \}\}\
+              />\
+\
+              <ReferenceLine\
+                y=\{24000\}\
+                stroke="#007AFF"\
+                strokeDasharray="5 5"\
+                label=\{\{\
+                  value: `Objetivo 24,000`,\
+                  position: "topLeft",\
+                  fontSize: 12,\
+                  fill: "#007AFF",\
+                \}\}\
+              />\
+\
+              \{showProj && projStart != null && (\
+                <ReferenceArea\
+                  x1=\{Math.max(projStart, filteredData[0]?.index || 0)\}\
+                  x2=\{filteredData[filteredData.length - 1]?.index || 0\}\
+                  strokeOpacity=\{0\}\
+                  fill="#007AFF"\
+                  fillOpacity=\{0.05\}\
+                />\
+              )\}\
+\
+              \{showPhases && filteredPhases.map((phase) => \{\
+                const startPoint = filteredData.find(d => d.dateStr >= phase.start);\
+                const endPoint = filteredData.find(d => d.dateStr > phase.end);\
+                \
+                if (startPoint && (endPoint || phase.end > filteredData[filteredData.length - 1]?.dateStr)) \{\
+                  return (\
+                    <ReferenceArea\
+                      key=\{phase.id\}\
+                      x1=\{startPoint.index\}\
+                      x2=\{endPoint ? endPoint.index : filteredData[filteredData.length - 1]?.index || 0\}\
+                      fill=\{phase.color\}\
+                      fillOpacity=\{0.1\}\
+                      strokeOpacity=\{0\}\
+                    />\
+                  );\
+                \}\
+                return null;\
+              \})\}\
+\
+              <Line\
+                data=\{filteredData.filter((d) => !d.projected)\}\
+                dataKey="value"\
+                name="Hist\'f3rico"\
+                stroke="#1C1C1E"\
+                strokeWidth=\{2\}\
+                dot=\{false\}\
+                activeDot=\{\{ r: 4, stroke: '#1C1C1E', strokeWidth: 2, fill: '#fff' \}\}\
+              />\
+\
+              \{showProj && (\
+                <Line\
+                  data=\{filteredData.filter((d) => d.projected)\}\
+                  dataKey="value"\
+                  name="Objetivo"\
+                  stroke="#007AFF"\
+                  strokeWidth=\{2\}\
+                  strokeDasharray="4 4"\
+                  dot=\{\{ r: 3, strokeWidth: 0, fill: "#007AFF" \}\}\
+                  activeDot=\{\{ r: 4, stroke: '#007AFF', strokeWidth: 2, fill: '#fff' \}\}\
+                />\
+              )\}\
+\
+              <Legend wrapperStyle=\{\{ fontSize: "12px", color: "#1C1C1E", marginTop: 10 \}\} />\
+            </LineChart>\
+          </ResponsiveContainer>\
+        </div>\
+      </div>\
+    </div>\
+  );\
+\}}
